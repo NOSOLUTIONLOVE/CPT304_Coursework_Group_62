@@ -346,9 +346,10 @@
             alertImportFillError: "Import Failed: could not fill table.\n",
             importSummary: "{good} row(s) ok, {bad} row(s) failed validation.",
             
-            cookieBannerText: "This website uses functional cookies to ensure the inventory system works properly. No personal data is collected.",
+            cookieBannerText: "This website uses functional cookies to ensure the inventory system works properly. No personal data is collected. Read our {privacyLink}.",
             cookieBannerAccept: "Accept",
-            cookieBannerDecline: "Decline"
+            cookieBannerDecline: "Decline",
+            cookieBannerPrivacyLink: "Privacy Policy"
         },
         	zh: {
             // 页面元信息
@@ -424,9 +425,10 @@
             alertImportFillError: "导入失败：无法填充表格。\n",
             importSummary: "{good} 行通过，{bad} 行失败。",
             
-            cookieBannerText: "本网站使用功能性 cookie 以确保库存系统正常运行。不会收集任何个人数据。",
+            cookieBannerText: "本网站使用功能性 cookie 以确保库存系统正常运行。不会收集任何个人数据。请阅读我们的{privacyLink}。",
             cookieBannerAccept: "接受",
-            cookieBannerDecline: "拒绝"
+            cookieBannerDecline: "拒绝",
+            cookieBannerPrivacyLink: "隐私政策"
         }
     	};
 
@@ -533,7 +535,10 @@
         if (emptyImg) emptyImg.alt = t('emptyImageAlt');
         
         var cookieBannerText = document.getElementById('cookie-banner-text');
-        if (cookieBannerText) cookieBannerText.textContent = t('cookieBannerText');
+        if (cookieBannerText) {
+            var privacyLinkHtml = '<a href="privacy-policy.html" style="color: #fff; text-decoration: underline; cursor: pointer;">' + t('cookieBannerPrivacyLink') + '</a>';
+            cookieBannerText.innerHTML = t('cookieBannerText', {privacyLink: privacyLinkHtml});
+        }
         var cookieAcceptBtn = document.getElementById('cookie-accept-btn');
         if (cookieAcceptBtn) cookieAcceptBtn.textContent = t('cookieBannerAccept');
         var cookieDeclineBtn = document.getElementById('cookie-decline-btn');
