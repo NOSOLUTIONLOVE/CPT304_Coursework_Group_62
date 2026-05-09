@@ -6,14 +6,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 	<meta name="description" content="UNIQLO Inventory Management System – manage stock items, quantities and pricing.">
     <title id="page-title">UNIQLO Inventory System</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <style>
+        .lang-switcher {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.9);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-family: Nunito, sans-serif;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .lang-switcher:hover {
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .lang-switcher select {
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+            cursor: pointer;
+            outline: none;
+        }
+
+    </style>
+    <!-- Cookie Consent CSS -->
+    <style>
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 2px solid #e50012;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+            padding: 20px 30px;
+            z-index: 9999;
+            display: none;
+            font-family: Nunito, sans-serif;
+        }
+        .cookie-banner.show {
+            display: block;
+        }
+        .cookie-banner-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .cookie-banner-text {
+            flex: 1;
+            min-width: 300px;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .cookie-banner-text strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #000;
+        }
+        .cookie-banner-text a {
+            color: #e50012;
+            text-decoration: underline;
+        }
+        .cookie-banner-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .cookie-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-family: Nunito, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .cookie-btn-primary {
+            background: #e50012;
+            color: #fff;
+        }
+        .cookie-btn-primary:hover {
+            background: #c40010;
+        }
+        .cookie-btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .cookie-btn-secondary:hover {
+            background: #e8e8e8;
+        }
+        @media (max-width: 768px) {
+            .cookie-banner-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .cookie-banner-text {
+                min-width: unset;
+            }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&family=Raleway:wght@300;400;600;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&family=Raleway:wght@300;400;600;800;900&display=swap">
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
-	<link href="assets/bootstrap/css/datatables.min.css" rel="stylesheet"/>
-	<link rel="stylesheet" href="assets/bootstrap/css/inventory.css">
+    <link rel="stylesheet" href="assets/bootstrap/css/datatables.min.css">
+    <link rel="stylesheet" href="assets/bootstrap/css/inventory.css">
 
 </head>
 <body id="page-top" style="background-color: #e50012;">
@@ -31,7 +145,7 @@
                                     <h5 class="modal-title" id="deleteModalLabel" style="font-size: calc(0.8vw + 0.8vh); color:rgb(0,0,0); font-family: Nunito; padding-top: 3px; padding-bottom: 3px; padding-left: 8px; font-weight: bold;">Delete Confirmation</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="padding-top: 3px; padding-bottom: 3px; padding-right: 20px;"></button>
                                 </div>
-                                <div class="modal-body" id="deleteModalText" style="font-size: calc(0.7vw + 0.7vh); color:rgb(0,0,0); font-family: Nunito; padding-left: 24px;">
+                                 <div id="deleteModalText" class="modal-body" style="font-size: calc(0.7vw + 0.7vh); color:rgb(0,0,0); font-family: Nunito; padding-left: 24px;">
                                     Are you sure you wish to remove this record?
                                 </div>
                                 <div class="modal-footer">
@@ -218,13 +332,10 @@
                                         <div class="col" style="margin-left: 2.6vw; margin-top: 25px; margin-bottom: 20px;">
                                             <div class="fw-bold text-xs"><span id="title" style="font-size: calc(0.8vw + 0.8vh); color:rgb(0,0,0); font-family: Nunito;">Manage Inventory</span></div>
                                         </div>
-                                        <div class="col" style="margin-right: 70px; margin-top: auto; margin-bottom: auto; text-align: right;">
-                                            <select id="lang-select" onchange="setLanguage(this.value)" style="font-size: calc(0.55vw + 0.55vh); font-family: Nunito; padding: 2px 8px; border: 1px solid rgba(0,0,0,0.2); border-radius: 4px; margin-right: 12px; vertical-align: middle;">
-                                                <option value="en">English</option>
-                                                <option value="zh">中文</option>
-                                            </select>
-                                            <img src="assets/images/uniqlo_logo.png" alt="UNIQLO" width="120" height="36" style="height: 4.7vh;">
-                                        </div>
+                                        <div class="col" style="margin-right: 70px; margin-top: auto; margin-bottom: auto; text-align: right; position: relative;">
+											<div id="lang-switcher-root" style="position: absolute; right: 150px; top: 50%; transform: translateY(-50%);"></div>
+											<img src="assets/images/uniqlo_logo.png" alt="UNIQLO" width="120" height="36" style="height: 4.7vh;">
+										</div> 
                                     </div>
                                     <input type="file" name="data" id="upload_data" style="display: none;" aria-label="Upload inventory data file"/>
                                     <div style="border-bottom: 2px solid rgba(0,0,0,0.1); width: 100%;"></div>
@@ -246,7 +357,7 @@
                                         </div>
                                     </div>
                                     <div class="row" style="margin: auto;" id="empty_animation">
-                                        <img id="empty_image" src="assets/images/empty.gif" alt="No inventory items. Please load or add data." style="height: 50vh;" fetchpriority="high" loading="eager" width="400" height="400">
+                                        <img src="assets/images/empty.gif" id="empty_animation_img" alt="No inventory items. Please load or add data." style="height: 50vh;" fetchpriority="high" loading="eager" width="400" height="400">
                                     </div>
                                 </div>
                             </div>
@@ -254,13 +365,6 @@
                     </div>
                 </div>
             </main>
-
-        </div>
-        
-        <div id="cookie-banner" style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.85); color: #fff; font-family: Nunito; font-size: calc(0.5vw + 0.5vh); padding: 12px 20px; display: flex; align-items: center; justify-content: center; gap: 16px; z-index: 1055; display: none; flex-wrap: wrap; text-align: center;">
-            <span id="cookie-banner-text" style="flex: 1 1 auto; min-width: 200px;">This website uses functional cookies to ensure the inventory system works properly. No personal data is collected.</span>
-            <button id="cookie-accept-btn" class="cookie-btn" style="font-family: Nunito; font-size: calc(0.48vw + 0.48vh); font-weight: bold; padding: 6px 20px; border-radius: 8px; border: 2px solid #fff; background: #fff; color: #000; cursor: pointer; white-space: nowrap;">Accept</button>
-            <button id="cookie-decline-btn" class="cookie-btn" style="font-family: Nunito; font-size: calc(0.48vw + 0.48vh); font-weight: bold; padding: 6px 20px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.5); background: transparent; color: #fff; cursor: pointer; white-space: nowrap;">Decline</button>
         </div>
     </div>
 	
@@ -273,28 +377,35 @@
 	<script>
 		var i18n = {
         	en: {
-            // 页面元信息
             pageTitle: "UNIQLO Inventory System",
             pageDescription: "UNIQLO Inventory Management System – manage stock items, quantities and pricing.",
-            
-            // 主标题
+        
             title: "Inventory Management",
-            
-            // 菜单/按钮
+
+		    colItemName: "Item Name",
+            colQuantity: "Quantity",
+            colType: "Type",
+            colUnitPrice: "Unit Price",
+            colTotalPrice: "Total Price",
+            colEdit: "Edit",
+            colDelete: "Delete",
+
             btnLoadData: "Load Data",
             btnNewData: "New Data",
-            btnEdit: "Edit",
             btnDelete: "Delete",
             btnUpdate: "Update",
             btnAdd: "Add",
-            btnSave: "Save",
             btnCancel: "Cancel",
             btnSkip: "Skip",
-            
-            // 弹窗标题
+            btnAddNew: "ADD NEW ITEM",
+            btnSaveData: "SAVE DATA",
+            btnOK: "OK",
+
+				
             modalDeleteTitle: "Delete Confirmation",
             modalDeleteText: "Are you sure you wish to remove this record?",
             modalImportTitle: "Import issues",
+			modalImportSummary: "{good} row(s) ok, {bad} row(s) failed validation.",
             modalImportSkipHint: "Skip: import only valid rows. Cancel: do not import anything.",
             modalUpdateTitle: "Update Confirmation",
             modalUpdateText: "Inventory has been successfully updated.",
@@ -303,77 +414,71 @@
             modalEditTitle: "Edit Item",
             modalAddItemTitle: "Add Item",
             
-            // 表单标签
             labelItemName: "Item Name",
             labelQuantity: "Quantity",
             labelType: "Type",
             labelUnitPrice: "Unit Price",
             labelTotalPrice: "Total Price",
-            placeholderValue: "Enter value",
+            placeholderValue: "Please enter a value.",
             
-            // 表格列头
-            colItemName: "Item Name",
-            colQuantity: "Quantity",
-            colType: "Type",
-            colUnitPrice: "Unit Price",
-            colTotalPrice: "Total Price",
-            colEdit: "Edit",
-            colDelete: "Delete",
-            
-            // DataTable
             dtSearchPlaceholder: "🔍 Search inventory",
-            dtEmptyTable: "Please choose 'Load Data' to import an existing database file, or 'New Data' to create a new database.",
+            dtEmptyTable: "Please select 'LOAD DATA' to load an existing database file or 'NEW DATA' to create a new one.",
             
-            // 消息/提示
             alertFileReadError: "Unable to read the selected file. Please try again.",
             alertImportFailed: "Import failed: ",
+			alertImportFillError: "Import Failed: could not fill table.\n",
+            alertNoValidRows: "No valid rows to import.",
             confirmImportMessage: "{good} rows passed, {bad} rows failed\\n\\nOK = skip bad rows and import the rest\\nCancel = abort import",
             
-            // 验证错误
             errQuantityInvalid: "Row {row}: quantity invalid or too large",
             errQuantityWhole: "Row {row}: quantity must be a whole number",
-            errQuantityDigits: "Row {row}: quantity must be a whole number (digits only)",
+            errQuantityDigits: "Row {row}: quantity must be a whole number (digits only, no letters or symbols)",
             errPriceNegative: "Row {row}: {field} cannot be negative",
             errPriceFormat: "Row {row}: {field} must be a positive amount, e.g. RM 129.00",
             errPriceZero: "Row {row}: {field} must be greater than 0",
-            errItemNameEmpty: "Row {row}: item name cannot be empty",
-            errTypeEmpty: "Row {row}: type cannot be empty",
+			errRowNotArray: "Row {row} is not a valid array.",
+			errRowMissingCols: "Row {row} is missing required columns.",
+            errItemNameEmpty: "Row {row}: Item name cannot be empty",
+            errTypeEmpty: "Row {row}: Type cannot be empty",
+			errUnrecognizedJSON: "Unrecognized JSON structure.",
+            errNoData: "The file contains no data.",
+            errFileTooLarge: "File too large. Maximum 5000 rows allowed.",
             
-            // 其他
-            andMore: "... and {count} more",
+            andMore: "\u2026 and {count} more",
             emptyImageAlt: "No inventory items, please load or add data",
-            alertNoValidRows: "No valid rows to import.",
-            alertImportFillError: "Import Failed: could not fill table.\n",
-            importSummary: "{good} row(s) ok, {bad} row(s) failed validation.",
+			menuInventory: "Inventory menu",
+            btnCharts: "Charts",
+            btnCalendar: "Calendar",
+            btnMessages: "Messages",
+            btnFiles: "Files",
+            designAlert: "Hi there! I added these buttons just for design because it looked kinda empty :3",
             
-            cookieBannerText: "This website uses functional cookies to ensure the inventory system works properly. No personal data is collected. Read our {privacyLink}.",
-            cookieBannerAccept: "Accept",
-            cookieBannerDecline: "Decline",
-            cookieBannerPrivacyLink: "Privacy Policy"
+            cookieTitle: "Cookie Consent",
+            cookieMessage: "We use functional cookies to ensure this inventory system works properly. By continuing to use this site, you agree to our use of cookies.",
+            cookieAccept: "Accept",
+            cookieDecline: "Decline",
+            cookiePrivacyLink: "Privacy Policy",
         },
         	zh: {
-            // 页面元信息
             pageTitle: "UNIQLO 库存管理系统",
             pageDescription: "UNIQLO 库存管理系统 – 管理库存商品、数量和价格。",
             
-            // 主标题
             title: "库存管理",
-            
-            // 菜单/按钮
+            btnAddNew: "添加新商品",
+			btnSaveData: "保存数据",
             btnLoadData: "加载数据",
             btnNewData: "新建数据",
-            btnEdit: "编辑",
             btnDelete: "删除",
             btnUpdate: "更新",
+			btnOK: "确定",
             btnAdd: "添加",
-            btnSave: "保存",
             btnCancel: "取消",
             btnSkip: "跳过",
             
-            // 弹窗标题
             modalDeleteTitle: "删除确认",
             modalDeleteText: "您确定要删除这条记录吗？",
             modalImportTitle: "导入问题",
+			modalImportSummary: "{good} 行成功，{bad} 行验证失败",
             modalImportSkipHint: "跳过：仅导入有效行。取消：不导入任何内容。",
             modalUpdateTitle: "更新确认",
             modalUpdateText: "库存已成功更新。",
@@ -382,15 +487,13 @@
             modalEditTitle: "编辑商品",
             modalAddItemTitle: "添加商品",
             
-            // 表单标签
             labelItemName: "商品名称",
             labelQuantity: "数量",
             labelType: "类型",
             labelUnitPrice: "单价",
             labelTotalPrice: "总价",
-            placeholderValue: "请输入",
+            placeholderValue: "请输入数值",
             
-            // 表格列头
             colItemName: "商品名称",
             colQuantity: "数量",
             colType: "类型",
@@ -403,39 +506,48 @@
             dtSearchPlaceholder: "🔍 搜索库存",
             dtEmptyTable: "请选择「加载数据」导入现有数据库文件，或选择「新建数据」创建新数据库",
             
-            // 消息/提示
             alertFileReadError: "无法读取所选文件，请重试",
             alertImportFailed: "导入失败：",
+			alertImportFillError: "导入失败：无法填充表格\n",
+			alertNoValidRows: "没有有效的行可以导入",
             confirmImportMessage: "{good} 行通过，{bad} 行失败\\n\\n确定 = 跳过错误行并导入其余内容\\n取消 = 中止导入",
-            
-            // 验证错误
+
             errQuantityInvalid: "第 {row} 行：数量无效或过大",
             errQuantityWhole: "第 {row} 行：数量必须是整数",
-            errQuantityDigits: "第 {row} 行：数量必须是整数（仅限数字）",
+            errQuantityDigits: "第 {row} 行：数量必须是整数（仅限数字，不能包含字母或符号）",
             errPriceNegative: "第 {row} 行：{field} 不能为负数",
             errPriceFormat: "第 {row} 行：{field} 必须是正数金额，例如 RM 129.00",
             errPriceZero: "第 {row} 行：{field} 必须大于 0",
+			errRowNotArray: "第 {row} 行不是有效的数组",
+			errRowMissingCols: "第 {row} 行缺少必需的列",
             errItemNameEmpty: "第 {row} 行：商品名称不能为空",
             errTypeEmpty: "第 {row} 行：类型不能为空",
+			errUnrecognizedJSON: "无法识别的 JSON 结构",
+            errNoData: "文件中没有数据",
+            errFileTooLarge: "文件过大，最多允许 5000 行",
             
-            // 其他
-            andMore: "... 还有 {count} 条",
+        
+            andMore: "\u2026 还有 {count} 条",
             emptyImageAlt: "没有库存项目，请加载或添加数据",
-            alertNoValidRows: "没有有效的行可导入。",
-            alertImportFillError: "导入失败：无法填充表格。\n",
-            importSummary: "{good} 行通过，{bad} 行失败。",
+            menuInventory: "库存菜单",
+            btnCharts: "图表",
+            btnCalendar: "日历",
+            btnMessages: "消息",
+            btnFiles: "文件",
+            designAlert: "嗨！添加这些按钮只是为了设计，因为看起来有点空 :3",
             
-            cookieBannerText: "本网站使用功能性 cookie 以确保库存系统正常运行。不会收集任何个人数据。请阅读我们的{privacyLink}。",
-            cookieBannerAccept: "接受",
-            cookieBannerDecline: "拒绝",
-            cookieBannerPrivacyLink: "隐私政策"
+            cookieTitle: "Cookie 同意",
+            cookieMessage: "我们使用功能性 Cookie 以确保此库存系统正常运行。继续使用本网站即表示您同意我们使用 Cookie。",
+            cookieAccept: "同意",
+            cookieDecline: "拒绝",
+            cookiePrivacyLink: "隐私政策",
         }
-    	};
+    };
 
-    	var currentLang = localStorage.getItem('inventory-lang') || 'en';
+    var currentLang = localStorage.getItem('inventory-lang') || 'en';
 
-    	function t(key, params) {
-        var text = i18n[currentLang][key] || i18n['en'][key] || key;
+    function t(key, params) {
+    	var text = i18n[currentLang][key] || i18n['en'][key] || key;
         if (params) {
             for (var k in params) {
                 text = text.replace(new RegExp('\\{' + k + '\\}', 'g'), params[k]);
@@ -444,11 +556,45 @@
         return text;
     	}
 
-    	function applyTranslations() {
+	var LangSwitcher = (function () {
+	    var SUPPORTED = [
+	        { value: 'en', label: 'English' },
+	        { value: 'zh', label: '中文'    }
+	    ];
+	
+	    function render(containerId) {
+	        var container = document.getElementById(containerId);
+	        if (!container) return;
+	
+	        var options = SUPPORTED.map(function (lang) {
+	            var selected = lang.value === currentLang ? ' selected' : '';
+	            return '<option value="' + lang.value + '"' + selected + '>'
+	                 + lang.label + '</option>';
+	        }).join('');
+	
+	        container.innerHTML =
+	            '<div class="lang-switcher">' +
+	                '<select id="lang-select" aria-label="Select language">' +
+	                    options +
+	                '</select>' +
+	            '</div>';
+	    
+	        var sel = container.querySelector('#lang-select');
+	        if (sel) {
+	            sel.addEventListener('change', function (e) {
+	                setLanguage(e.target.value);
+	            });
+	        }
+	    }
+	
+	
+	    return { render: render, SUPPORTED: SUPPORTED };
+	})();
+
+	
+    function applyTranslations() {
         document.documentElement.lang = currentLang;
-        
-        var selectEl = document.getElementById('lang-select');
-        if (selectEl) selectEl.value = currentLang;
+        LangSwitcher.render('lang-switcher-root');
         
         var elements = {
             'page-title': 'pageTitle',
@@ -531,26 +677,24 @@
         var metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) metaDesc.content = t('pageDescription');
         
-        var emptyImg = document.getElementById('empty_image');
+        var emptyImg = document.getElementById('empty_animation_img');
         if (emptyImg) emptyImg.alt = t('emptyImageAlt');
         
-        var cookieBannerText = document.getElementById('cookie-banner-text');
-        if (cookieBannerText) {
-            var privacyLinkHtml = '<a href="privacy-policy.html" style="color: #fff; text-decoration: underline; cursor: pointer;">' + t('cookieBannerPrivacyLink') + '</a>';
-            cookieBannerText.innerHTML = t('cookieBannerText', {privacyLink: privacyLinkHtml});
-        }
-        var cookieAcceptBtn = document.getElementById('cookie-accept-btn');
-        if (cookieAcceptBtn) cookieAcceptBtn.textContent = t('cookieBannerAccept');
-        var cookieDeclineBtn = document.getElementById('cookie-decline-btn');
-        if (cookieDeclineBtn) cookieDeclineBtn.textContent = t('cookieBannerDecline');
         
-        document.querySelectorAll('[data-i18n]').forEach(function(el) {
-            var key = el.getAttribute('data-i18n');
-            if (key) el.textContent = t(key);
+        document.querySelectorAll('[data-i18n-aria]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n-aria');
+            if (key) el.setAttribute('aria-label', t(key));
         });
+       
+        if (document.getElementById('cookie-banner') && 
+                document.getElementById('cookie-banner').classList.contains('show')) {
+                applyCookieTranslations();
+            }
+
+
     }
 
-    	function setLanguage(lang) {
+    function setLanguage(lang) {
         currentLang = lang;
         localStorage.setItem('inventory-lang', lang);
         applyTranslations();
@@ -617,13 +761,13 @@
 				"dom": '<"pull-left"f><"pull-right"B>tip',
 				buttons: [
 					{
-						text: t('btnAdd'),
+						text: t('btnAddNew'),
 						action: function ( e, dt, node, config ) {
 							$('#addModal').modal('toggle');
 						}
 					},
 					{
-						text: t('btnSave'),
+						text: t('btnSaveData'),
 						action: function ( e, dt, button, config ) {
 							var data = dt.buttons.exportData();
 		 
@@ -650,12 +794,12 @@
 			var currentDeleteRow = null;
 			
 			function delete_Row(a){
-				datatable.row( $(a).parents('tr') ).remove().draw();
-				if (datatable.rows().count() == 0){
+				window.datatable.row( $(a).parents('tr') ).remove().draw();
+				if (window.datatable.rows().count() == 0){
 					for(var i=0; i<buttonShow.length; i++){
-						if(buttonShow[i].innerHTML == '<span>'+t('btnAdd')+'</span>'){
+						if(buttonShow[i].innerHTML == '<span>'+t('btnAddNew')+'</span>'){
 							 buttonShow[i].hidden = true;
-						} else if (buttonShow[i].innerHTML == '<span>'+t('btnSave')+'</span>'){
+						} else if (buttonShow[i].innerHTML == '<span>'+t('btnSaveData')+'</span>'){
 							 buttonShow[i].hidden = true;
 						} else if (buttonShow[i].innerHTML == '<span>'+t('btnLoadData')+'</span>'){
 							 buttonShow[i].hidden = false;
@@ -681,11 +825,11 @@
 			
 			$('#myTable').on('click', 'td.editor-edit', function () {
 				b = this;
-				$('#edit_data').find('input[id="edit_itemname"]').val(datatable.row(b).data()[0]);
-				$('#edit_data').find('input[id="edit_quantity"]').val(datatable.row(b).data()[1]);
-				$('#edit_data').find('input[id="edit_type"]').val(datatable.row(b).data()[2]);
-				$('#edit_data').find('input[id="edit_unit_price"]').val(datatable.row(b).data()[3]);
-				$('#edit_data').find('input[id="edit_total_price"]').val(datatable.row(b).data()[4]);
+				$('#edit_data').find('input[id="edit_itemname"]').val(window.datatable.row(b).data()[0]);
+				$('#edit_data').find('input[id="edit_quantity"]').val(window.datatable.row(b).data()[1]);
+				$('#edit_data').find('input[id="edit_type"]').val(window.datatable.row(b).data()[2]);
+				$('#edit_data').find('input[id="edit_unit_price"]').val(window.datatable.row(b).data()[3]);
+				$('#edit_data').find('input[id="edit_total_price"]').val(window.datatable.row(b).data()[4]);
 				$('#editModal').modal('toggle');
 			} );
 			
@@ -696,7 +840,7 @@
 				var final_unit = parseFloat($('#edit_data').find('input[id="edit_unit_price"]').val().replace(/[^0-9.]/g,''));
 				$('#edit_data').find('input[id="edit_unit_price"]').val('RM '+final_unit.toFixed(2));
 				var newData = [$('#edit_data').find('input[id="edit_itemname"]').val(),$('#edit_data').find('input[id="edit_quantity"]').val(),$('#edit_data').find('input[id="edit_type"]').val(),$('#edit_data').find('input[id="edit_unit_price"]').val(),$('#edit_data').find('input[id="edit_total_price"]').val()];
-				datatable.row(b).data(newData).draw();
+				window.datatable.row(b).data(newData).draw();
 				$('#editModal').modal('toggle');
 				$('#updateConfirmationModal').modal('toggle');
 			} );
@@ -708,13 +852,13 @@
 				var final_unit = parseFloat($('#add_data').find('input[id="add_unit_price"]').val().replace(/[^0-9.]/g,''));
 				$('#add_data').find('input[id="add_unit_price"]').val('RM '+final_unit.toFixed(2));
 				var newData = [$('#add_data').find('input[id="add_itemname"]').val(),$('#add_data').find('input[id="add_quantity"]').val(),$('#add_data').find('input[id="add_type"]').val(),$('#add_data').find('input[id="add_unit_price"]').val(),$('#add_data').find('input[id="add_total_price"]').val()];
-				datatable.row.add(newData).draw();
+				window.datatable.row.add(newData).draw();
 				$('#addModal').modal('toggle');
 				$('#addConfirmationModal').modal('toggle');
 				for(var i=0; i<buttonShow.length; i++){
-					if(buttonShow[i].innerHTML == '<span>'+t('btnAdd')+'</span>'){
+					if(buttonShow[i].innerHTML == '<span>'+t('btnAddNew')+'</span>'){
 						 buttonShow[i].hidden = false;
-					} else if (buttonShow[i].innerHTML == '<span>'+t('btnSave')+'</span>'){
+					} else if (buttonShow[i].innerHTML == '<span>'+t('btnSaveData')+'</span>'){
 						 buttonShow[i].hidden = false;
 					} else if (buttonShow[i].innerHTML == '<span>'+t('btnLoadData')+'</span>'){
 						 buttonShow[i].hidden = true;
@@ -776,16 +920,16 @@
 			
 			var buttonShow = document.getElementsByTagName('button');
 			for(var i=0; i<buttonShow.length; i++){
-				if(buttonShow[i].innerHTML == '<span>'+t('btnAdd')+'</span>'){
+				if(buttonShow[i].innerHTML === '<span>'+t('btnAddNew')+'</span>'){
 					 buttonShow[i].classList.add("add_button");
 					 buttonShow[i].hidden = true;
-				} else if (buttonShow[i].innerHTML == '<span>'+t('btnSave')+'</span>'){
+				} else if (buttonShow[i].innerHTML === '<span>'+t('btnSaveData')+'</span>'){
 					 buttonShow[i].classList.add("data_button");
 					 buttonShow[i].hidden = true;
-				} else if (buttonShow[i].innerHTML == '<span>'+t('btnLoadData')+'</span>'){
+				} else if (buttonShow[i].innerHTML === '<span>'+t('btnLoadData')+'</span>'){
 					 buttonShow[i].classList.add("data_button");
 					 buttonShow[i].setAttribute("onclick", "document.getElementById('upload_data').click();");
-				} else if (buttonShow[i].innerHTML == '<span>'+t('btnNewData')+'</span>'){
+				} else if (buttonShow[i].innerHTML ==='<span>'+t('btnNewData')+'</span>'){
 					 buttonShow[i].classList.add("add_button");
 				}
 			}
@@ -828,8 +972,8 @@
 			}
 
 			function normalizeImportRow(row, index) {
-				if (!Array.isArray(row)) throw new Error("Row " + (index + 1) + " is not a valid array.");
-				if (row.length < 5) throw new Error("Row " + (index + 1) + " is missing required columns.");
+				if (!Array.isArray(row)) throw new Error(t("errRowNotArray", {row: index + 1}));
+				if (row.length < 5) throw new Error(t("errRowMissingCols", {row: index + 1}));
 
 				var itemName = row[0] ? row[0].toString().trim().substring(0, 100) : "";
 				var type = row[2] ? row[2].toString().trim().substring(0, 50) : "";
@@ -885,11 +1029,11 @@
 			}
 
 			function applyImportedRows(cleanRows) {
-				datatable.clear();
-				datatable.rows.add(cleanRows).draw();
+				window.datatable.clear();
+				window.datatable.rows.add(cleanRows).draw();
 				for (var i = 0; i < buttonShow.length; i++) {
 					var btnText = buttonShow[i].textContent.trim();
-					if (btnText === t('btnAdd') || btnText === t('btnSave')) {
+					if (btnText === t('btnAddNew') || btnText === t('btnSaveData')) {
 						buttonShow[i].hidden = false;
 					} else if (btnText === t('btnLoadData') || btnText === t('btnNewData')) {
 						buttonShow[i].hidden = true;
@@ -924,11 +1068,11 @@
 				} else if (Array.isArray(parsed)) {
 				  dataRows = parsed;
 				} else {
-				  throw new Error("Unrecognized JSON structure.");
+				  throw new Error(t("errUnrecognizedJSON"));
 				}
 
-				if (!dataRows || dataRows.length === 0) throw new Error("The file contains no data.");
-				if (dataRows.length > 5000) throw new Error("File too large. Maximum 5000 rows allowed.");
+				if (!dataRows || dataRows.length === 0) throw new Error(t("errNoData"));
+				if (dataRows.length > 5000) throw new Error(t("errFileTooLarge"));
 
 			  } catch (err) {
 				alert(t('alertImportFailed') + err.message);
@@ -955,7 +1099,7 @@
 			  var bad = issueMessages.length;
 			  var good = cleanRows.length;
 			  $('#importIssues_summary').text(
-				t('importSummary', {good: good, bad: bad})
+				t('modalImportSummary', {good: good, bad: bad})
 			  );
 			  var $list = $('#importIssues_list').empty();
 			  var maxShow = 25;
@@ -963,7 +1107,7 @@
 				$list.append($('<li></li>').text(issueMessages[j]));
 			  }
 			  if (issueMessages.length > maxShow) {
-				$list.append($('<li></li>').text(t('andMore', {count: issueMessages.length - maxShow})));
+				$list.append($('<li></li>').text("… and " + (issueMessages.length - maxShow) + " more."));
 			  }
 			  $('#importIssuesModal').data('pendingRows', cleanRows);
 			  if (!openImportIssuesModal()) {
@@ -1009,7 +1153,6 @@
 			document.getElementById('upload_data')
 			  .addEventListener('change', readSingleFile, false);
 			  
-	
 			
 			$('.menu_button').hover(function(){
 				$(this).find(".square_bg").addClass("menu_select_hover");
@@ -1017,23 +1160,84 @@
 				$(this).find(".square_bg").removeClass("menu_select_hover");
 			});
 			
-			applyTranslations();
 			
-			var consent = localStorage.getItem('cookie-consent');
-			if (!consent) {
-				document.getElementById('cookie-banner').style.display = 'flex';
-			}
-			document.getElementById('cookie-accept-btn').addEventListener('click', function () {
-				localStorage.setItem('cookie-consent', 'accepted');
-				document.getElementById('cookie-banner').style.display = 'none';
-			});
-			document.getElementById('cookie-decline-btn').addEventListener('click', function () {
-				localStorage.setItem('cookie-consent', 'declined');
-				document.getElementById('cookie-banner').style.display = 'none';
-			});
+			LangSwitcher.render('lang-switcher-root');
 			
-		} );
-	</script>
+            document.querySelectorAll('.design-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    alert(t('designAlert'));
+                });
+            });
+
+            var cookieConsent = localStorage.getItem('cookie-consent');
+            var cookieBanner = document.getElementById('cookie-banner');
+            var cookieAcceptBtn = document.getElementById('cookie-accept');
+            var cookieDeclineBtn = document.getElementById('cookie-decline');
+            
+            function applyCookieTranslations() {
+                var titleEl = document.getElementById('cookie-title');
+                var msgEl = document.getElementById('cookie-message');
+                var privacyEl = document.getElementById('cookie-privacy-link');
+                var acceptEl = document.getElementById('cookie-accept');
+                var declineEl = document.getElementById('cookie-decline');
+                
+                if (titleEl) titleEl.textContent = t('cookieTitle');
+                if (msgEl) {                
+                    var privacyLinkHtml = ' <a href="privacy.html" id="cookie-privacy-link" target="_blank">' + t('cookiePrivacyLink') + '</a>';
+                    msgEl.innerHTML = t('cookieMessage') + privacyLinkHtml;
+                }
+                if (acceptEl) acceptEl.textContent = t('cookieAccept');
+                if (declineEl) declineEl.textContent = t('cookieDecline');
+            }
+            
+            function showCookieBanner() {
+                if (cookieBanner && !cookieConsent) {
+                    cookieBanner.classList.add('show');
+                    applyCookieTranslations();
+                }
+            }
+            
+            function acceptCookies() {
+                localStorage.setItem('cookie-consent', 'accepted');
+                if (cookieBanner) cookieBanner.classList.remove('show');
+            }
+            
+            function declineCookies() {
+                localStorage.setItem('cookie-consent', 'declined');
+                if (cookieBanner) cookieBanner.classList.remove('show');
+            }
+                      
+            if (cookieAcceptBtn) {
+                cookieAcceptBtn.addEventListener('click', acceptCookies);
+            }
+            if (cookieDeclineBtn) {
+                cookieDeclineBtn.addEventListener('click', declineCookies);
+            }
+                      
+            showCookieBanner();          
+            applyTranslations();
+        });
+    </script>
+
+    <!-- Footer -->
+    <div style="text-align: center; padding: 8px; font-size: 12px; color: rgba(255,255,255,0.7); font-family: Nunito;">
+        <a href="privacy.html" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: underline;">Privacy Policy</a>
+    </div>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" class="cookie-banner">
+        <div class="cookie-banner-content">
+            <div class="cookie-banner-text" id="cookie-banner-text">
+                <strong id="cookie-title">Cookie Consent</strong>
+                <span id="cookie-message">We use functional cookies to ensure this inventory system works properly. By continuing to use this site, you agree to our use of cookies.</span>
+            </div>
+            <div class="cookie-banner-buttons">
+                <button class="cookie-btn cookie-btn-primary" id="cookie-accept">Accept</button>
+                <button class="cookie-btn cookie-btn-secondary" id="cookie-decline">Decline</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
