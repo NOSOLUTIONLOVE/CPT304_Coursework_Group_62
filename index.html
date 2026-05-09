@@ -131,8 +131,8 @@
 				$('#editModal').modal('toggle');
 			} );
 			
-			$('#edit_data').on('submit', function () {
-				event.preventDefault();
+			$('#edit_data').on('submit', function (e) {
+                e.preventDefault();
 				var final_quantity = parseFloat($('#edit_data').find('input[id="quantity"]').val().replace(/[^0-9.]/g,''));
 				$('#edit_data').find('input[id="quantity"]').val(final_quantity.toFixed(0));
 				var final_unit = parseFloat($('#edit_data').find('input[id="unit_price"]').val().replace(/[^0-9.]/g,''));
@@ -143,8 +143,8 @@
 				$('#updateConfirmationModal').modal('toggle');
 			} );
 
-			$('#add_data').on('submit', function () {
-				event.preventDefault();
+			$('#add_data').on('submit', function (e) {
+                e.preventDefault();
 				var final_quantity = parseFloat($('#add_data').find('input[id="quantity"]').val().replace(/[^0-9.]/g,''));
 				$('#add_data').find('input[id="quantity"]').val(final_quantity.toFixed(0));
 				var final_unit = parseFloat($('#add_data').find('input[id="unit_price"]').val().replace(/[^0-9.]/g,''));
