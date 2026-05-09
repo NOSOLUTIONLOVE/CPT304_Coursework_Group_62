@@ -19,6 +19,7 @@
 	<link href="assets/bootstrap/css/datatables.min.css" rel="stylesheet"/>
 	<link rel="stylesheet" href="assets/bootstrap/css/inventory.css">
 	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
 	<script src="assets/js/datatables.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready( function () {
@@ -231,37 +232,221 @@
 				}
 			}
 			
+			function parseImportQuantity(raw, rowNum) {
+				if (typeof raw === "number" && isFinite(raw)) {
+					if (raw < 0 || raw > 1000000000) {
+						throw new Error("Row " + rowNum + ": Quantity is invalid or too large.");
+					}
+					if (Math.floor(raw) !== raw) {
+						throw new Error("Row " + rowNum + ": Quantity must be a whole number.");
+					}
+					return Math.floor(raw);
+				}
+				var s = String(raw != null ? raw : "").trim();
+				if (!/^\d+$/.test(s)) {
+					throw new Error("Row " + rowNum + ": Quantity must be a whole number (digits only, no letters or symbols).");
+				}
+				var n = parseInt(s, 10);
+				if (!isFinite(n) || n > 1000000000) {
+					throw new Error("Row " + rowNum + ": Quantity is invalid or too large.");
+				}
+				return n;
+			}
+
+			function parseImportMoneyPositive(raw, rowNum, fieldLabel) {
+				var orig = String(raw != null ? raw : "").trim();
+				if (orig.indexOf("-") >= 0 || orig.indexOf("\u2212") >= 0) {
+					throw new Error("Row " + rowNum + ": " + fieldLabel + " cannot be negative.");
+				}
+				var s = orig.replace(/^RM\s*/i, "").replace(/,/g, "").trim();
+				if (!/^\d+(\.\d+)?$/.test(s)) {
+					throw new Error("Row " + rowNum + ": " + fieldLabel + " must be a positive amount like RM 129.00.");
+				}
+				var n = parseFloat(s);
+				if (!isFinite(n) || n <= 0) {
+					throw new Error("Row " + rowNum + ": " + fieldLabel + " must be greater than 0.");
+				}
+				return n;
+			}
+
+			function normalizeImportRow(row, index) {
+				if (!Array.isArray(row)) throw new Error("Row " + (index + 1) + " is not a valid array.");
+				if (row.length < 5) throw new Error("Row " + (index + 1) + " is missing required columns.");
+
+				var itemName = row[0] ? row[0].toString().trim().substring(0, 100) : "";
+				var type = row[2] ? row[2].toString().trim().substring(0, 50) : "";
+
+				if (itemName === "") throw new Error("Row " + (index + 1) + ": Item Name cannot be empty.");
+				if (type === "") throw new Error("Row " + (index + 1) + ": Type cannot be empty.");
+
+				var rowNum = index + 1;
+				var quantity = parseImportQuantity(row[1], rowNum);
+				var unit = parseImportMoneyPositive(row[3], rowNum, "Unit price");
+				var expectedTotal = Math.round(quantity * unit * 100) / 100;
+
+				return [
+					itemName,
+					quantity.toFixed(0),
+					type,
+					'RM ' + unit.toFixed(2),
+					'RM ' + expectedTotal.toFixed(2)
+				];
+			}
+
+			function openImportIssuesModal() {
+				var el = document.getElementById("importIssuesModal");
+				if (el && typeof bootstrap !== "undefined" && bootstrap.Modal) {
+					bootstrap.Modal.getOrCreateInstance(el).show();
+					return true;
+				}
+				if (el && window.jQuery && typeof window.jQuery.fn.modal === "function") {
+					window.jQuery(el).modal("show");
+					return true;
+				}
+				return false;
+			}
+
+			function closeImportIssuesModal() {
+				var el = document.getElementById("importIssuesModal");
+				if (!el) return;
+				if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+					bootstrap.Modal.getOrCreateInstance(el).hide();
+					return;
+				}
+				if (window.jQuery && typeof window.jQuery.fn.modal === "function") {
+					window.jQuery(el).modal("hide");
+				}
+			}
+
+			function tryNormalizeImportRow(row, index) {
+				try {
+					return { ok: true, row: normalizeImportRow(row, index) };
+				} catch (e) {
+					return { ok: false, msg: e.message || String(e) };
+				}
+			}
+
+			function applyImportedRows(cleanRows) {
+				datatable.clear();
+				datatable.rows.add(cleanRows).draw();
+				for (var i = 0; i < buttonShow.length; i++) {
+					var btnText = buttonShow[i].textContent.trim();
+					if (btnText === 'ADD NEW ITEM' || btnText === 'SAVE DATA') {
+						buttonShow[i].hidden = false;
+					} else if (btnText === 'LOAD DATA' || btnText === 'NEW DATA') {
+						buttonShow[i].hidden = true;
+					}
+				}
+				$('#empty_animation').attr("hidden", true);
+			}
+			
 			function readSingleFile(e) {
-			  var file = e.target.files[0];
-			  if (!file) {
-				return;
-			  }
-			  var reader = new FileReader();
-			  reader.onload = function(e) {
-				var contents = e.target.result;
-				displayContents(contents);
-			  };
-			  reader.readAsText(file);
+				var file = e.target.files[0];
+				if (!file) { return; }
+				var reader = new FileReader();
+				reader.onload = function (ev) {
+					displayContents(ev.target.result);
+				};
+				reader.onerror = function () {
+					alert("Could not read the selected file. Please try again.");
+					document.getElementById('upload_data').value = "";
+				};
+				reader.readAsText(file);
 			}
 
 			function displayContents(contents) {
-			  dataSrc = JSON.parse(contents.split('"body":')[1].split('}')[0]);
-			  $('#myTable').dataTable().fnClearTable();
-			  $('#myTable').dataTable().fnAddData(dataSrc);
-			  for(var i=0; i<buttonShow.length; i++){
-				if(buttonShow[i].innerHTML == '<span>ADD NEW ITEM</span>'){
-					 buttonShow[i].hidden = false;
-				} else if (buttonShow[i].innerHTML == '<span>SAVE DATA</span>'){
-					 buttonShow[i].hidden = false;
-				} else if (buttonShow[i].innerHTML == '<span>LOAD DATA</span>'){
-					 buttonShow[i].hidden = true;
-				} else if (buttonShow[i].innerHTML == '<span>NEW DATA</span>'){
-					 buttonShow[i].hidden = true;
-				}
-			  }
-			  $('#empty_animation').attr("hidden",true);
 			  document.getElementById('upload_data').value = "";
+			  var dataRows = null;
+
+			  try {
+				var parsed = JSON.parse(contents);
+
+				if (parsed && Array.isArray(parsed.body)) {
+				  dataRows = parsed.body;
+				} else if (Array.isArray(parsed)) {
+				  dataRows = parsed;
+				} else {
+				  throw new Error("Unrecognized JSON structure.");
+				}
+
+				if (!dataRows || dataRows.length === 0) throw new Error("The file contains no data.");
+				if (dataRows.length > 5000) throw new Error("File too large. Maximum 5000 rows allowed.");
+
+			  } catch (err) {
+				alert("Import Failed: " + err.message);
+				return;
+			  }
+
+			  var cleanRows = [];
+			  var issueMessages = [];
+			  for (var ri = 0; ri < dataRows.length; ri++) {
+				var res = tryNormalizeImportRow(dataRows[ri], ri);
+				if (res.ok) cleanRows.push(res.row);
+				else issueMessages.push(res.msg);
+			  }
+
+			  if (issueMessages.length === 0) {
+				try {
+				  applyImportedRows(cleanRows);
+				} catch (applyErr) {
+				  alert("Import Failed: could not fill table.\n" + (applyErr && applyErr.message ? applyErr.message : applyErr));
+				}
+				return;
+			  }
+
+			  var bad = issueMessages.length;
+			  var good = cleanRows.length;
+			  $('#importIssues_summary').text(
+				good + " row(s) ok, " + bad + " row(s) failed validation."
+			  );
+			  var $list = $('#importIssues_list').empty();
+			  var maxShow = 25;
+			  for (var j = 0; j < issueMessages.length && j < maxShow; j++) {
+				$list.append($('<li></li>').text(issueMessages[j]));
+			  }
+			  if (issueMessages.length > maxShow) {
+				$list.append($('<li></li>').text("… and " + (issueMessages.length - maxShow) + " more."));
+			  }
+			  $('#importIssuesModal').data('pendingRows', cleanRows);
+			  if (!openImportIssuesModal()) {
+				var msg = good + " row(s) passed, " + bad + " row(s) failed.\n\nOK = Skip bad rows and import the rest.\nCancel = Abort import.";
+				if (window.confirm(msg)) {
+				  if (cleanRows.length === 0) {
+					alert("No valid rows to import.");
+				  } else {
+					try {
+					  applyImportedRows(cleanRows);
+					} catch (applyErr) {
+					  alert("Import Failed: could not fill table.\n" + (applyErr && applyErr.message ? applyErr.message : applyErr));
+					}
+				  }
+				}
+				$('#importIssuesModal').removeData('pendingRows');
+			  }
 			}
+
+			$('#importIssues_skip').on('click', function () {
+			  var rows = $('#importIssuesModal').data('pendingRows');
+			  closeImportIssuesModal();
+			  $('#importIssuesModal').removeData('pendingRows');
+			  if (!rows || rows.length === 0) {
+				alert("No valid rows to import.");
+				return;
+			  }
+			  try {
+				applyImportedRows(rows);
+			  } catch (applyErr) {
+				alert("Import Failed: could not fill table.\n" + (applyErr && applyErr.message ? applyErr.message : applyErr));
+			  }
+			});
+
+			$('#importIssues_cancel').on('click', function () {
+			  $('#importIssuesModal').removeData('pendingRows');
+			});
+
+			$('#importIssuesModal .btn-close').on('click', function () {
+			  $('#importIssuesModal').removeData('pendingRows');
+			});
 
 			document.getElementById('upload_data')
 			  .addEventListener('change', readSingleFile, false);
@@ -302,6 +487,29 @@
 						  </div>
 						  <div class="modal-footer">
 							<button type="button" class="modal_button" data-bs-dismiss="modal" id="delete_button">Delete</button>
+						  </div>
+						</div>
+					  </div>
+					</div>
+
+					<!-- Modal: invalid rows on LOAD DATA -->
+					<div class="modal fade" id="importIssuesModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+					  <div class="modal-dialog modal-dialog-centered modal-lg">
+						<div class="modal-content">
+						  <div class="modal-header">
+							<h5 class="modal-title" style="font-size: calc(0.8vw + 0.8vh); color:rgb(0,0,0); font-family: Nunito; font-weight: bold;">Import issues</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="padding-top: 3px; padding-bottom: 3px; padding-right: 20px;"></button>
+						  </div>
+						  <div class="modal-body" style="font-size: calc(0.65vw + 0.65vh); color:rgb(0,0,0); font-family: Nunito; padding-left: 24px;">
+							<p id="importIssues_summary" style="margin-bottom: 10px;"></p>
+							<div style="max-height: 40vh; overflow: auto; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 10px; background: rgba(0,0,0,0.03);">
+							  <ul id="importIssues_list" style="margin: 0; padding-left: 1.2em;"></ul>
+							</div>
+							<p style="margin-top: 12px; margin-bottom: 0;">Skip: import only valid rows. Cancel: do not import anything.</p>
+						  </div>
+						  <div class="modal-footer">
+							<button type="button" class="modal_button" id="importIssues_skip">Skip</button>
+							<button type="button" class="modal_button" data-bs-dismiss="modal" id="importIssues_cancel">Cancel</button>
 						  </div>
 						</div>
 					  </div>
@@ -495,7 +703,6 @@
             </div>
         </div>
     </div>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/chart.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
     <script src="assets/js/theme.js"></script>
