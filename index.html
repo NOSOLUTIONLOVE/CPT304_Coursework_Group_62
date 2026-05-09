@@ -24,15 +24,37 @@
 	<script type="text/javascript">
 		$(document).ready( function () {
 			var dataSrc = "";
-		
+
+			function parseCurrencySortValue(raw) {
+				var s = String(raw != null ? raw : '').replace(/^RM\s*/i, '').replace(/,/g, '').trim();
+				var n = parseFloat(s);
+				return isFinite(n) ? n : 0;
+			}
+			
 			var datatable = $('#myTable').DataTable( {
 				data : dataSrc,
 				columns: [
 					null,
 					null,
 					null,
-					null,
-					null,
+					{
+						data: 3,
+						render: function (data, type) {
+							if (type === 'sort' || type === 'type') {
+								return parseCurrencySortValue(data);
+							}
+							return data;
+						}
+					},
+					{
+						data: 4,
+						render: function (data, type) {
+							if (type === 'sort' || type === 'type') {
+								return parseCurrencySortValue(data);
+							}
+							return data;
+						}
+					},
 					{
 						data: null,
 						className: "dt-center editor-edit",
