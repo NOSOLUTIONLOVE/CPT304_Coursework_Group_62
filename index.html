@@ -256,6 +256,12 @@
             </main>
 
         </div>
+        
+        <div id="cookie-banner" style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.85); color: #fff; font-family: Nunito; font-size: calc(0.5vw + 0.5vh); padding: 12px 20px; display: flex; align-items: center; justify-content: center; gap: 16px; z-index: 1055; display: none; flex-wrap: wrap; text-align: center;">
+            <span id="cookie-banner-text" style="flex: 1 1 auto; min-width: 200px;">This website uses functional cookies to ensure the inventory system works properly. No personal data is collected.</span>
+            <button id="cookie-accept-btn" class="cookie-btn" style="font-family: Nunito; font-size: calc(0.48vw + 0.48vh); font-weight: bold; padding: 6px 20px; border-radius: 8px; border: 2px solid #fff; background: #fff; color: #000; cursor: pointer; white-space: nowrap;">Accept</button>
+            <button id="cookie-decline-btn" class="cookie-btn" style="font-family: Nunito; font-size: calc(0.48vw + 0.48vh); font-weight: bold; padding: 6px 20px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.5); background: transparent; color: #fff; cursor: pointer; white-space: nowrap;">Decline</button>
+        </div>
     </div>
 	
 	<script src="assets/js/jquery.min.js" defer></script>
@@ -338,7 +344,11 @@
             emptyImageAlt: "No inventory items, please load or add data",
             alertNoValidRows: "No valid rows to import.",
             alertImportFillError: "Import Failed: could not fill table.\n",
-            importSummary: "{good} row(s) ok, {bad} row(s) failed validation."
+            importSummary: "{good} row(s) ok, {bad} row(s) failed validation.",
+            
+            cookieBannerText: "This website uses functional cookies to ensure the inventory system works properly. No personal data is collected.",
+            cookieBannerAccept: "Accept",
+            cookieBannerDecline: "Decline"
         },
         	zh: {
             // 页面元信息
@@ -412,7 +422,11 @@
             emptyImageAlt: "没有库存项目，请加载或添加数据",
             alertNoValidRows: "没有有效的行可导入。",
             alertImportFillError: "导入失败：无法填充表格。\n",
-            importSummary: "{good} 行通过，{bad} 行失败。"
+            importSummary: "{good} 行通过，{bad} 行失败。",
+            
+            cookieBannerText: "本网站使用功能性 cookie 以确保库存系统正常运行。不会收集任何个人数据。",
+            cookieBannerAccept: "接受",
+            cookieBannerDecline: "拒绝"
         }
     	};
 
@@ -517,6 +531,13 @@
         
         var emptyImg = document.getElementById('empty_image');
         if (emptyImg) emptyImg.alt = t('emptyImageAlt');
+        
+        var cookieBannerText = document.getElementById('cookie-banner-text');
+        if (cookieBannerText) cookieBannerText.textContent = t('cookieBannerText');
+        var cookieAcceptBtn = document.getElementById('cookie-accept-btn');
+        if (cookieAcceptBtn) cookieAcceptBtn.textContent = t('cookieBannerAccept');
+        var cookieDeclineBtn = document.getElementById('cookie-decline-btn');
+        if (cookieDeclineBtn) cookieDeclineBtn.textContent = t('cookieBannerDecline');
         
         document.querySelectorAll('[data-i18n]').forEach(function(el) {
             var key = el.getAttribute('data-i18n');
@@ -992,6 +1013,19 @@
 			});
 			
 			applyTranslations();
+			
+			var consent = localStorage.getItem('cookie-consent');
+			if (!consent) {
+				document.getElementById('cookie-banner').style.display = 'flex';
+			}
+			document.getElementById('cookie-accept-btn').addEventListener('click', function () {
+				localStorage.setItem('cookie-consent', 'accepted');
+				document.getElementById('cookie-banner').style.display = 'none';
+			});
+			document.getElementById('cookie-decline-btn').addEventListener('click', function () {
+				localStorage.setItem('cookie-consent', 'declined');
+				document.getElementById('cookie-banner').style.display = 'none';
+			});
 			
 		} );
 	</script>
