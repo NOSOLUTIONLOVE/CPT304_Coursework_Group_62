@@ -51,15 +51,32 @@
             text-decoration: none;
             font-size: calc(0.55vw + 0.55vh);
         }
-        .lang-switch {
-            font-family: Nunito;
-            font-size: calc(0.48vw + 0.48vh);
-            padding: 4px 10px;
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.5);
-            background: transparent;
-            color: #fff;
+        .lang-switcher {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.9);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-family: Nunito, sans-serif;
+            font-size: 14px;
+            color: #333;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .lang-switcher:hover {
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .lang-switcher select {
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+            cursor: pointer;
+            outline: none;
         }
         .footer {
             text-align: center;
@@ -73,12 +90,14 @@
 <body>
     <div class="header">
         <h1 id="page-title">Privacy Policy</h1>
-        <div>
-            <select id="lang-select" class="lang-switch" onchange="switchLang(this.value)">
-                <option value="en">English</option>
-                <option value="zh">中文</option>
-            </select>
-            <a href="index.html" class="back-link" style="margin-left: 20px;">&larr; Back</a>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="lang-switcher">
+                <select id="lang-select" onchange="switchLang(this.value)">
+                    <option value="en">English</option>
+                    <option value="zh">中文</option>
+                </select>
+            </div>
+            <a href="index.html" class="back-link">&larr; Back</a>
         </div>
     </div>
     <div class="container" id="content-en">
