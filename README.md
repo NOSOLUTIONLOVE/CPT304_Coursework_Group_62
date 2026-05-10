@@ -61,6 +61,43 @@ The UI also references `assets/images/uniqlo_logo.png` and `assets/images/empty.
 
 <br>
 
+Below is a concise overview of the four high-severity defects selected by our group: what each issue is and its impact.
+
+### 1. Duplicate binding on delete confirmation button 
+
+| Item | Description |
+|------|-------------|
+| **Issue** | In the old implementation, each click on the table delete icon bound another click handler on `#delete_button`, stacking multiple handlers on the same button. |
+| **Impact** | After the user opens the delete modal several times, a single click on “Delete” may fire `delete_Row()` multiple times, deleting multiple rows or leaving the table in an inconsistent state. |
+
+
+### 2. Form submit handlers use global `event` 
+
+| Item | Description |
+|------|-------------|
+| **Issue** | The `submit` callbacks for `#edit_data` and `#add_data` use the global variable `event` directly instead of the event object passed into the callback. |
+| **Impact** | `event` is not guaranteed to exist in every environment; strict mode, some browsers, or modular setups may throw `ReferenceError: event is not defined`, so add/update inventory operations fail. |
+
+
+### 3. LOAD DATA parsing relies on string splitting 
+
+| Item | Description |
+|------|-------------|
+| **Issue** | `displayContents` slices the text with patterns such as `contents.split('"body":')[1].split('}')[0]` before `JSON.parse`, tightly coupling parsing to a fixed string layout. |
+| **Impact** | Small changes to the file format can cause `TypeError` or parse failures; without clear errors, load failures are easy to miss, and in severe cases the script may stop; a failed parse can also corrupt the previous data state. |
+
+
+### 4. Price columns sorted as strings 
+
+| Item | Description |
+|------|-------------|
+| **Issue** | Unit Price and Total Price are stored as strings with an `"RM "` prefix; DataTables uses default string sorting instead of numeric sorting. |
+| **Impact** | Sorting by the price column header does not reflect true monetary order (e.g. RM 15.10 may appear after RM 140.00). Users may not notice, which misleads price comparisons and inventory valuation decisions. |
+
+
+
+<br>
+
 ## Examples (En)
 - ### Privacy Page
   <img width="1259" height="622" alt="4" src="https://github.com/user-attachments/assets/fb0f865a-d3fa-412b-9911-10a1025cc042" />
