@@ -1,0 +1,26 @@
+{
+  "name": "cpt304_coursework_group_62",
+  "version": "1.0.0",
+  "description": "This repository contains the source code for a web-based inventory management system with CRUD functionality. The theme of the web app follows the famous clothing brand, named 'UNIQLO'. This project was created for one of my internship interview's technical assessment.",
+  "main": "index.js",
+  "scripts": {
+  "test": "vitest run",
+  "test:coverage": "vitest run --coverage"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://SSSSR939@github.com/NOSOLUTIONLOVE/CPT304_Coursework_Group_62.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/NOSOLUTIONLOVE/CPT304_Coursework_Group_62/issues"
+  },
+  "homepage": "https://github.com/NOSOLUTIONLOVE/CPT304_Coursework_Group_62#readme",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.5",
+    "vitest": "^4.1.5"
+  }
+}
