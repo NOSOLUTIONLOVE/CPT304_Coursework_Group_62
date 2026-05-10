@@ -61,6 +61,8 @@ The UI also references `assets/images/uniqlo_logo.png` and `assets/images/empty.
 
 <br>
 
+## Four specific deficiencies
+
 Below is a concise overview of the four high-severity defects selected by our group: what each issue is and its impact.
 
 ### 1. Duplicate binding on delete confirmation button 
