@@ -1,0 +1,26 @@
+{
+  "name": "cpt304-group62-test",
+  "version": "1.0.0",
+  "description": "CPT304-group62-test",
+  "main": "index.js",
+  "scripts": {
+  "test": "vitest run",
+  "test:coverage": "vitest run --coverage"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://SSSSR939@github.com/Sssr939/CPT304-group62-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Sssr939/CPT304-group62-test/issues"
+  },
+  "homepage": "https://github.com/Sssr939/CPT304-group62-test#readme",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.5",
+    "vitest": "^4.1.5"
+  }
+}
