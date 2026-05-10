@@ -97,7 +97,7 @@
                     <option value="zh">中文</option>
                 </select>
             </div>
-            <a href="index.html" class="back-link">&larr; Back</a>
+            <a href="index.html" class="back-link" id="back-link">&larr; Back</a>
         </div>
     </div>
     <div class="container" id="content-en">
@@ -164,7 +164,7 @@
             document.documentElement.lang = currentLang;
             var selectEl = document.getElementById('lang-select');
             if (selectEl) selectEl.value = currentLang;
-
+            var backLink = document.getElementById('back-link');
             var enContent = document.getElementById('content-en');
             var zhContent = document.getElementById('content-zh');
             var title = document.getElementById('page-title');
@@ -173,10 +173,12 @@
                 if (enContent) enContent.style.display = 'none';
                 if (zhContent) zhContent.style.display = 'block';
                 if (title) title.textContent = '隐私政策';
+                if (backLink) backLink.innerHTML = '← 返回';
             } else {
                 if (enContent) enContent.style.display = 'block';
                 if (zhContent) zhContent.style.display = 'none';
                 if (title) title.textContent = 'Privacy Policy';
+                if (backLink) backLink.innerHTML = '← Back';
             }
         }
 
