@@ -21,6 +21,13 @@
             transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+		#myTable thead th:last-child {
+            text-align: right;
+            padding-right: 10px;
+        }
+        .qty-control {
+            justify-content: flex-end;
+        }
         .lang-switcher:hover {
             background: #fff;
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -34,7 +41,7 @@
             cursor: pointer;
             outline: none;
         }
-
+		
     </style>
     <!-- Cookie Consent CSS -->
     <style>
@@ -110,6 +117,91 @@
         .cookie-btn-secondary:hover {
             background: #e8e8e8;
         }
+		.floating-actions {
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            z-index: 999;
+        }
+
+        .fab-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 14px 22px;
+            font-family: Nunito, sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: 0.25s ease;
+            cursor: pointer;
+        }
+
+        .fab-btn:hover {
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        .fab-red {
+            background: #e50012;
+        }
+
+        .fab-dark {
+            background: #1f1f1f;
+        }
+
+        .fab-select {
+            background: white;
+            color: #e50012;
+            border: 2px solid #e50012;
+        }
+        .select-mode .row-checkbox {
+            display: inline-block !important;
+        }
+
+        .row-checkbox {
+            display: none !important;
+            width: 20px;
+            height: 20px;
+            accent-color: #e50012;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+		#select-all {
+		    display: none;
+		}
+		body.select-mode #select-all {
+		    display: inline-block;
+		}
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #e50012;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .qty-input {
+            width: 60px;
+            text-align: center;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 4px;
+        }
         @media (max-width: 768px) {
             .cookie-banner-content {
                 flex-direction: column;
@@ -142,14 +234,15 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteModalLabel" style="font-size: calc(0.8vw + 0.8vh); color:rgb(0,0,0); font-family: Nunito; padding-top: 3px; padding-bottom: 3px; padding-left: 8px; font-weight: bold;">Delete Confirmation</h5>
+                                    <h5 class="modal-title" id="deleteModalLabel" style="font-size: calc(0.8vw + 0.8vh); color:rgb(0,0,0); font-family: Nunito; font-weight: bold;">Delete Confirmation</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="padding-top: 3px; padding-bottom: 3px; padding-right: 20px;"></button>
                                 </div>
                                  <div id="deleteModalText" class="modal-body" style="font-size: calc(0.7vw + 0.7vh); color:rgb(0,0,0); font-family: Nunito; padding-left: 24px;">
                                     Are you sure you wish to remove this record?
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="modal_button" data-bs-dismiss="modal" id="delete_button">Delete</button>
+                                    <button type="button" class="modal_button" id="delete_button" data-bs-dismiss="modal">Delete</button>
+                                    <button type="button" class="modal_button" data-bs-dismiss="modal">Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -292,6 +385,45 @@
                         </div>
                     </div>
 
+					<div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                                <div class="modal-header" style="background: #f8f9fa; border-radius: 15px 15px 0 0;">
+                                    <h5 class="modal-title fw-bold" style="font-family: Nunito; color: #e50012;">
+                                        <i class="fas fa-receipt me-2"></i>Transaction Receipt
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="font-family: Nunito; padding: 25px;">
+                                    <div id="receipt-items-list">
+                                    </div>
+                                    <hr style="border-top: 2px dashed #ddd;">
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="h5 fw-bold">Total Amount:</span>
+                                        <span id="receipt-total" class="h4 fw-bold text-danger">RM 0.00</span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="border: none;">
+                                    <button type="button" class="btn btn-dark w-100" data-bs-dismiss="modal" style="border-radius: 10px; padding: 10px;">DONE</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generic Notification Modal -->
+                    <div class="modal fade" id="notificationModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="border-radius: 12px;">
+                                <div class="modal-header" style="border-bottom: none;">
+                                    <h5 class="modal-title fw-bold" style="color: #e50012;">Notice</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center" id="notificationMessage" style="font-size: 16px; padding-bottom: 30px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-1 p-0">
                             <div class="row" style="margin-top: 68px">
@@ -344,6 +476,9 @@
                                             <table id="myTable" class="row-border hover" style="font-size: calc(0.6vw + 0.6vh); font-family: Nunito; color: black;" aria-label="Inventory table">
                                                 <thead>
                                                     <tr>
+														<th scope="col">
+                                                            <input type="checkbox" id="select-all" aria-label="Select all rows">
+                                                        </th>
                                                         <th scope="col">Item Name</th>
                                                         <th scope="col">Quantity</th>
                                                         <th scope="col">Type</th>
@@ -351,6 +486,7 @@
                                                         <th scope="col">Total Price</th>
                                                         <th scope="col"><span class="visually-hidden">Edit</span></th>
                                                         <th scope="col"><span class="visually-hidden">Delete</span></th>
+														<th scope="col">Buy Qty</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -368,7 +504,7 @@
         </div>
     </div>
 	
-	<script src="assets/js/jquery.min.js" defer></script>
+	<script src="assets/js/jquery.min.js"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js" defer></script>
     <script src="assets/js/datatables.min.js" defer></script>
     <script src="assets/js/bs-init.js" defer></script>
@@ -389,18 +525,28 @@
             colTotalPrice: "Total Price",
             colEdit: "Edit",
             colDelete: "Delete",
-
+			btnSelectMode: "SELECT",
+            btnCancelSelect: "CANCEL",
+            btnPurchase: "CONFIRM ORDER",
             btnLoadData: "Load Data",
             btnNewData: "New Data",
             btnDelete: "Delete",
             btnUpdate: "Update",
             btnAdd: "Add",
-            btnCancel: "Cancel",
             btnSkip: "Skip",
             btnAddNew: "ADD NEW ITEM",
             btnSaveData: "SAVE DATA",
             btnOK: "OK",
-
+			colBuyQty: "Buy Qty",
+			btnSelect: "SELECT",
+            btnCancel: "CANCEL",
+            btnConfirmOrder: "CONFIRM ORDER",
+            btnDeleteSelected: "DELETE SELECTED",
+            noticeTitle: "Notice",
+            errNoSelectionDelete: "Please select at least one item to delete.",
+            errNoSelectionPurchase: "Please select items to purchase.",
+            footerPrivacy: "Privacy Policy",
+            orderCompleted: "Order completed!",
 				
             modalDeleteTitle: "Delete Confirmation",
             modalDeleteText: "Are you sure you wish to remove this record?",
@@ -443,6 +589,9 @@
 			errUnrecognizedJSON: "Unrecognized JSON structure.",
             errNoData: "The file contains no data.",
             errFileTooLarge: "File too large. Maximum 5000 rows allowed.",
+			errInvalidDeleteQty: "Please enter a valid delete quantity.",
+            errDeleteExceedStock: "Delete quantity exceeds stock amount ({stock}).",
+            deleteCompleted: "Delete completed!",
             
             andMore: "\u2026 and {count} more",
             emptyImageAlt: "No inventory items, please load or add data",
@@ -472,9 +621,11 @@
             btnUpdate: "更新",
 			btnOK: "确定",
             btnAdd: "添加",
-            btnCancel: "取消",
             btnSkip: "跳过",
-            
+			btnSelectMode: "选择",
+            btnCancelSelect: "取消",
+            btnPurchase: "确认下单",
+				
             modalDeleteTitle: "删除确认",
             modalDeleteText: "您确定要删除这条记录吗？",
             modalImportTitle: "导入问题",
@@ -486,7 +637,17 @@
             modalAddText: "新商品已成功添加。",
             modalEditTitle: "编辑商品",
             modalAddItemTitle: "添加商品",
-            
+
+			btnSelect: "选择",
+            btnCancel: "取消",
+            btnConfirmOrder: "确认下单",
+            btnDeleteSelected: "删除所选",
+            noticeTitle: "提示",
+            errNoSelectionDelete: "请至少选择一项进行删除。",
+            errNoSelectionPurchase: "请选择要购买的商品。",
+            footerPrivacy: "隐私政策",
+            orderCompleted: "订单已完成！",
+			
             labelItemName: "商品名称",
             labelQuantity: "数量",
             labelType: "类型",
@@ -501,7 +662,7 @@
             colTotalPrice: "总价",
             colEdit: "编辑",
             colDelete: "删除",
-            
+            colBuyQty: "购买数量",
             // DataTable
             dtSearchPlaceholder: "🔍 搜索库存",
             dtEmptyTable: "请选择「加载数据」导入现有数据库文件，或选择「新建数据」创建新数据库",
@@ -525,7 +686,9 @@
 			errUnrecognizedJSON: "无法识别的 JSON 结构",
             errNoData: "文件中没有数据",
             errFileTooLarge: "文件过大，最多允许 5000 行",
-            
+            errInvalidDeleteQty: "请输入有效的删除数量。",
+            errDeleteExceedStock: "删除数量超过库存数量（当前库存：{stock}）。",
+            deleteCompleted: "删除完成！",
         
             andMore: "\u2026 还有 {count} 条",
             emptyImageAlt: "没有库存项目，请加载或添加数据",
@@ -660,14 +823,17 @@
             window.datatable.columns().every(function(index) {
                 var headerText = '';
                 switch(index) {
-                    case 0: headerText = t('colItemName'); break;
-                    case 1: headerText = t('colQuantity'); break;
-                    case 2: headerText = t('colType'); break;
-                    case 3: headerText = t('colUnitPrice'); break;
-                    case 4: headerText = t('colTotalPrice'); break;
-                    case 5: headerText = '<span class="visually-hidden">' + t('colEdit') + '</span>'; break;
-                    case 6: headerText = '<span class="visually-hidden">' + t('colDelete') + '</span>'; break;
-                }
+					case 0: 
+                        return; 
+                    case 1: headerText = t('colItemName'); break;
+                    case 2: headerText = t('colQuantity'); break;
+                    case 3: headerText = t('colType'); break;
+                    case 4: headerText = t('colUnitPrice'); break;
+                    case 5: headerText = t('colTotalPrice'); break;
+                    case 6: headerText = '<span class="visually-hidden">' + t('colEdit') + '</span>'; break;
+                    case 7: headerText = '<span class="visually-hidden">' + t('colDelete') + '</span>'; break;
+                	case 8: headerText = t('colBuyQty'); break; 
+				}
                 if (headerText) {
                     $(window.datatable.column(index).header()).html(headerText);
                 }
@@ -690,7 +856,42 @@
                 document.getElementById('cookie-banner').classList.contains('show')) {
                 applyCookieTranslations();
             }
+	var selectBtn = document.getElementById('select-mode-btn');
+    if (selectBtn) {
+        selectBtn.textContent = $('body').hasClass('select-mode') ? t('btnCancel') : t('btnSelect');
+    }
+		
+	var purchaseBtn = document.getElementById('purchase-btn');
+    if (purchaseBtn) purchaseBtn.textContent = t('btnConfirmOrder');
 
+    var deleteSelBtn = document.getElementById('delete-selected-btn');
+    if (deleteSelBtn) deleteSelBtn.textContent = t('btnDeleteSelected');
+
+    var privacyLink = document.querySelector('footer a') || document.querySelector('div[style*="font-size: 12px"] a');
+    if (privacyLink) privacyLink.textContent = t('footerPrivacy');
+    
+    var noticeTitle = document.querySelector('#notificationModal .modal-title');
+    if (noticeTitle) noticeTitle.textContent = t('noticeTitle');    
+    
+    if (window.datatable) {
+            window.datatable.button(0).text(t('btnAddNew'));
+            window.datatable.button(1).text(t('btnSaveData'));
+            window.datatable.button(2).text(t('btnNewData'));
+            window.datatable.button(3).text(t('btnLoadData'));
+
+            var searchInput =
+                document.querySelector('.dataTables_filter input');
+
+            if (searchInput) {
+                searchInput.placeholder =
+                    t('dtSearchPlaceholder');
+            }
+
+            window.datatable.settings()[0].oLanguage.sEmptyTable =
+                t('dtEmptyTable');
+
+            window.datatable.draw(false);
+            }
 
     }
 
@@ -698,13 +899,19 @@
         currentLang = lang;
         localStorage.setItem('inventory-lang', lang);
         applyTranslations();
-        location.reload(); 
+        window.datatable.draw(false);
     	}
 
 
 		document.addEventListener('DOMContentLoaded', function () {
 			var dataSrc = "";
 
+			function showNotice(msg) {
+                $('#notificationMessage').text(msg);
+                var notifyModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+                notifyModal.show();
+            }
+			
 			function parseCurrencySortValue(raw) {
 				var s = String(raw != null ? raw : '').replace(/^RM\s*/i, '').replace(/,/g, '').trim();
 				var n = parseFloat(s);
@@ -712,11 +919,21 @@
 			}
 			
 			window.datatable = $('#myTable').DataTable( {
+				order: [],
 				data : dataSrc,
 				columns: [
-					null,
-					null,
-					null,
+					{
+                        data: null,
+                        className: "dt-center",
+                        orderable: false,
+                        render: function(data, type, row, meta) {
+                            return `<input type="checkbox" class="row-checkbox" aria-label="Select row">`;
+                        },
+                        width: "40px"
+                    },
+                    { data: 0 },
+                    { data: 1 },
+                    { data: 2 },
 					{
 						data: 3,
 						render: function (data, type) {
@@ -746,7 +963,21 @@
 						className: "dt-center editor-delete",
 						defaultContent: '<i class="fas fa-trash-alt" style="cursor: pointer;" aria-label="Delete item"/>',
 						orderable: false
-					}
+					},
+					{
+                        data: null,
+                        orderable: false,
+                        render: function(data, type, row) {
+                            let maxQty = parseInt(row[1]);
+                            return `
+                                <div class="qty-control" style="justify-content: flex-start; padding-left: 20px;">
+                                    <button class="qty-btn minus-btn">-</button>
+                                    <input type="number" class="qty-input" min="1" max="${maxQty}" value="1">
+                                    <button class="qty-btn plus-btn">+</button>
+                                </div>
+                            `;
+                        }
+                    }
 				],
 				"scrollY": "65vh",
 				"scrollCollapse": true,
@@ -762,12 +993,14 @@
 				buttons: [
 					{
 						text: t('btnAddNew'),
+						className: 'add_button',
 						action: function ( e, dt, node, config ) {
 							$('#addModal').modal('toggle');
 						}
 					},
 					{
 						text: t('btnSaveData'),
+						className: 'data_button',
 						action: function ( e, dt, button, config ) {
 							var data = dt.buttons.exportData();
 		 
@@ -779,36 +1012,29 @@
 					},
 					{
 						text: t('btnNewData'),
+						className: 'add_button',
 						action: function ( e, dt, node, config ) {
 							$('#addModal').modal('toggle');
 						}
 					},
 					{
-						text: t('btnLoadData')
+						text: t('btnLoadData'),
+						className: 'data_button'
 					}
 				]
 			});
 			
-	
+			$(window.datatable.button(0).node()).hide(); 
+            $(window.datatable.button(1).node()).hide(); 
+            $(window.datatable.button(3).node()).attr('onclick', "document.getElementById('upload_data').click();");
 			var b = null;
 			var currentDeleteRow = null;
 			
 			function delete_Row(a){
-				window.datatable.row( $(a).parents('tr') ).remove().draw();
-				if (window.datatable.rows().count() == 0){
-					for(var i=0; i<buttonShow.length; i++){
-						if(buttonShow[i].innerHTML == '<span>'+t('btnAddNew')+'</span>'){
-							 buttonShow[i].hidden = true;
-						} else if (buttonShow[i].innerHTML == '<span>'+t('btnSaveData')+'</span>'){
-							 buttonShow[i].hidden = true;
-						} else if (buttonShow[i].innerHTML == '<span>'+t('btnLoadData')+'</span>'){
-							 buttonShow[i].hidden = false;
-						} else if (buttonShow[i].innerHTML == '<span>'+t('btnNewData')+'</span>'){
-							 buttonShow[i].hidden = false;
-						}
-					}
-					$('#empty_animation').attr("hidden",false);
-				}
+				var row = window.datatable.row($(a).parents('tr'));
+				row.remove().draw(false);
+                updateUIState();
+                sessionStorage.setItem('inventoryData', JSON.stringify(window.datatable.data().toArray()));
 			};
 			
 			$('#myTable').on('click', 'td.editor-delete', function () {
@@ -855,17 +1081,7 @@
 				window.datatable.row.add(newData).draw();
 				$('#addModal').modal('toggle');
 				$('#addConfirmationModal').modal('toggle');
-				for(var i=0; i<buttonShow.length; i++){
-					if(buttonShow[i].innerHTML == '<span>'+t('btnAddNew')+'</span>'){
-						 buttonShow[i].hidden = false;
-					} else if (buttonShow[i].innerHTML == '<span>'+t('btnSaveData')+'</span>'){
-						 buttonShow[i].hidden = false;
-					} else if (buttonShow[i].innerHTML == '<span>'+t('btnLoadData')+'</span>'){
-						 buttonShow[i].hidden = true;
-					} else if (buttonShow[i].innerHTML == '<span>'+t('btnNewData')+'</span>'){
-						 buttonShow[i].hidden = true;
-					}
-				}
+				updateUIState();
 				$('#empty_animation').attr("hidden",true);
 				$('#add_data').find('input[id="add_itemname"]').val('');
 				$('#add_data').find('input[id="add_quantity"]').val('');
@@ -917,22 +1133,25 @@
 				var total = sanitized * quantity_no;
 				$('#add_data').find('input[id="add_total_price"]').val('RM '+total.toFixed(2));
 			});
-			
-			var buttonShow = document.getElementsByTagName('button');
-			for(var i=0; i<buttonShow.length; i++){
-				if(buttonShow[i].innerHTML === '<span>'+t('btnAddNew')+'</span>'){
-					 buttonShow[i].classList.add("add_button");
-					 buttonShow[i].hidden = true;
-				} else if (buttonShow[i].innerHTML === '<span>'+t('btnSaveData')+'</span>'){
-					 buttonShow[i].classList.add("data_button");
-					 buttonShow[i].hidden = true;
-				} else if (buttonShow[i].innerHTML === '<span>'+t('btnLoadData')+'</span>'){
-					 buttonShow[i].classList.add("data_button");
-					 buttonShow[i].setAttribute("onclick", "document.getElementById('upload_data').click();");
-				} else if (buttonShow[i].innerHTML ==='<span>'+t('btnNewData')+'</span>'){
-					 buttonShow[i].classList.add("add_button");
-				}
-			}
+
+			function updateUIState() {
+                var rowCount = window.datatable.rows().count();
+                var emptyAnim = $('#empty_animation');
+
+                if (rowCount > 0) {
+                    emptyAnim.attr("hidden", true);
+                    $(window.datatable.button(0).node()).show();
+                    $(window.datatable.button(1).node()).show();
+                    $(window.datatable.button(2).node()).hide();
+                    $(window.datatable.button(3).node()).hide();
+                } else {
+                    emptyAnim.attr("hidden", false);
+                    $(window.datatable.button(0).node()).hide();
+                    $(window.datatable.button(1).node()).hide();
+                    $(window.datatable.button(2).node()).show();
+                    $(window.datatable.button(3).node()).show();
+                }
+            }
 			
 			function parseImportQuantity(raw, rowNum) {
 				if (typeof raw === "number" && isFinite(raw)) {
@@ -1031,14 +1250,7 @@
 			function applyImportedRows(cleanRows) {
 				window.datatable.clear();
 				window.datatable.rows.add(cleanRows).draw();
-				for (var i = 0; i < buttonShow.length; i++) {
-					var btnText = buttonShow[i].textContent.trim();
-					if (btnText === t('btnAddNew') || btnText === t('btnSaveData')) {
-						buttonShow[i].hidden = false;
-					} else if (btnText === t('btnLoadData') || btnText === t('btnNewData')) {
-						buttonShow[i].hidden = true;
-					}
-				}
+				updateUIState();
 				$('#empty_animation').attr("hidden", true);
 			}
 			
@@ -1146,6 +1358,11 @@
 			  $('#importIssuesModal').removeData('pendingRows');
 			});
 
+			$('#select-all').on('change', function() {
+                var checked = $(this).prop('checked');
+                $('#myTable tbody .row-checkbox').prop('checked', checked);
+            });
+			
 			$('#importIssuesModal .btn-close').on('click', function () {
 			  $('#importIssuesModal').removeData('pendingRows');
 			});
@@ -1216,6 +1433,180 @@
                       
             showCookieBanner();          
             applyTranslations();
+			let selectMode = false;
+
+            $('#select-mode-btn').on('click', function() {
+                let isModeActive = $('body').toggleClass('select-mode').hasClass('select-mode');
+
+                if(isModeActive) {
+                    $(this).text(t('btnCancel'));
+                    $('#purchase-btn, #delete-selected-btn').fadeIn();
+                } else {
+                    $(this).text(t('btnSelect'));
+                    $('#purchase-btn, #delete-selected-btn').fadeOut();
+                    $('.row-checkbox').prop('checked', false);
+					$('#select-all').prop('checked', false);
+                }
+            });
+
+            $('#myTable tbody').on('click', '.plus-btn', function() {
+                let input = $(this).siblings('.qty-input');
+                let max = parseInt(input.attr('max'));
+                let val = parseInt(input.val());
+                if(val < max) input.val(val + 1);
+            });
+
+            $('#myTable tbody').on('click', '.minus-btn', function() {
+                let input = $(this).siblings('.qty-input');
+                let val = parseInt(input.val());
+                if(val > 1) input.val(val - 1);
+            });
+
+            $('#delete-selected-btn').on('click', function () {
+                var checkedRows = $('#myTable tbody .row-checkbox:checked');
+
+                if (checkedRows.length === 0) {
+                    showNotice(t('errNoSelectionDelete'));
+                    return;
+                }
+                var hasError = false;
+
+                checkedRows.each(function () {
+                    var tr = $(this).closest('tr');
+                    var row = window.datatable.row(tr);
+                    var data = row.data();
+                    var stockQty = parseInt(data[1]);
+                    var inputQty = parseInt(
+                        tr.find('.qty-input').val()
+                    ) || 0;
+
+                    if (inputQty <= 0) {
+                        hasError = true;
+                        showNotice(t('errInvalidDeleteQty'));
+                        return false;
+                    }
+
+                    if (inputQty > stockQty) {
+                        hasError = true;
+                        showNotice(
+                            t('errDeleteExceedStock', {
+                                stock: stockQty
+                            })
+                        );
+                        return false;
+                    }
+                });
+
+                if (hasError) return;
+
+                checkedRows.each(function () {
+                    var tr = $(this).closest('tr');
+                    var row = window.datatable.row(tr);
+                    var data = row.data();
+                    var stockQty = parseInt(data[1]);
+                    var deleteQty = parseInt(
+                        tr.find('.qty-input').val()
+                    );
+
+                    var remainQty = stockQty - deleteQty;
+
+                    if (remainQty > 0) {
+                        data[1] = remainQty.toString();
+                        var unitPrice = parseFloat(
+                            data[3].replace(/[^0-9.]/g, '')
+                        );
+                        data[4] =
+                            'RM ' +
+                            (unitPrice * remainQty).toFixed(2);
+
+                        row.data(data);
+
+                    } else {
+                        row.remove();
+                    }
+                });
+
+                window.datatable.draw(false);
+
+                updateUIState();
+
+                showNotice(t('deleteCompleted'));
+                });
+
+            $('#purchase-btn').off('click').on('click', function() {
+                let receiptHtml = '';
+                let grandTotal = 0;
+                let hasSelection = false;
+                let hasError = false;
+
+                $('#myTable tbody tr').each(function() {
+                    let checkbox = $(this).find('.row-checkbox');
+                    if (checkbox.is(':checked')) {
+                        hasSelection = true;
+                        let row = window.datatable.row($(this));
+                        let data = row.data();
+                        let stock = parseInt(data[1]);
+                        let buyQty = parseInt($(this).find('.qty-input').val());
+
+                        if (buyQty > stock) {
+                            hasError = true;
+                            showNotice(t('errDeleteExceedStock', { stock: stock }));
+                            return false;
+                        }
+                    }
+                });
+
+                if (!hasSelection) {
+                    showNotice(t('errNoSelectionPurchase'));
+                    return;
+                }
+
+                if (hasError) return;
+
+                $('#myTable tbody tr').each(function() {
+                    let checkbox = $(this).find('.row-checkbox');
+                    if (checkbox.is(':checked')) {
+                        let row = window.datatable.row($(this));
+                        let data = row.data();
+                        let itemName = data[0];
+                        let stock = parseInt(data[1]);
+                        let unitPrice = parseFloat(data[3].replace(/[^0-9.]/g,''));
+                        let buyQty = parseInt($(this).find('.qty-input').val());
+
+                        let subtotal = unitPrice * buyQty;
+                        grandTotal += subtotal;
+
+                        receiptHtml += `
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><strong>${itemName}</strong> <small class="text-muted">x${buyQty}</small></span>
+                                <span>RM ${subtotal.toFixed(2)}</span>
+                            </div>`;
+
+                        let newStock = stock - buyQty;
+                        if (newStock <= 0) {
+                            row.remove();
+                        } else {
+                            data[1] = newStock.toString();
+                            data[4] = 'RM ' + (unitPrice * newStock).toFixed(2);
+                            row.data(data);
+                        }
+                    }
+                });
+
+                $('#receipt-items-list').html(receiptHtml);
+                $('#receipt-total').text('RM ' + grandTotal.toFixed(2));
+                
+                var myReceiptModal = new bootstrap.Modal(document.getElementById('receiptModal'));
+                myReceiptModal.show();
+
+                window.datatable.draw();
+                updateUIState();
+                sessionStorage.setItem('inventoryData', JSON.stringify(window.datatable.data().toArray()));
+                
+                if($('body').hasClass('select-mode')) {
+                    $('#select-mode-btn').click();
+                }
+            });
         });
     </script>
 
@@ -1236,6 +1627,11 @@
                 <button class="cookie-btn cookie-btn-secondary" id="cookie-decline">Decline</button>
             </div>
         </div>
+    </div>
+	<div class="floating-actions">
+        <button id="select-mode-btn" class="fab-btn fab-select">SELECT</button>
+        <button id="purchase-btn" class="fab-btn fab-dark" style="display:none;">CONFIRM ORDER</button>
+        <button id="delete-selected-btn" class="fab-btn fab-red" style="display:none;">DELETE SELECTED</button>
     </div>
 
 </body>
