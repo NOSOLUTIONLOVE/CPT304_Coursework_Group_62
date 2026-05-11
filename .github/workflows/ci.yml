@@ -16,7 +16,7 @@ jobs:
           cache-dependency-path: test/package-lock.json
       - run: cd test && npm ci
       - run: cd test && npm run test:coverage
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./test/coverage/lcov.info
